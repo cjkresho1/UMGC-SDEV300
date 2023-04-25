@@ -1,6 +1,5 @@
 from flask import Flask
 from flask import render_template
-import re
 from datetime import datetime
 
 app = Flask(__name__)
@@ -11,15 +10,13 @@ def home():
     return render_template("welcome.html", date=datetime.now())
 
 
-@app.route("/hello/")
-@app.route("/hello_there")
-@app.route("/hello_there.html")
-def hello_there(name = None):
-    return render_template(
-        "hello_there.html",
-        name=name,
-        date=datetime.now()
-    )
+@app.route("/rick_roll/")
+@app.route("/rick_roll.html")
+@app.route("/rickroll/")
+@app.route("/display_image/")
+@app.route("/display_image.html")
+def rickroll():
+    return render_template("display_image.html")
 
 
 @app.route("/coolest_games/")
