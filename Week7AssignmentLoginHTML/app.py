@@ -1,5 +1,5 @@
 """A web applicate using Flask.
-Charles Kresho, 04/25/23
+Charles Kresho, 05/02/23
 """
 from datetime import datetime
 import re
@@ -25,16 +25,19 @@ app.config.update(
 cur_user = None
 user_dict = {}
 
-with open('user_login_data.txt', 'r+', encoding="UTF-8") as file:
-    while True:
-        # For each line, extract the username and hashed password
-        line = file.readline()
-        line = line.strip()
-        if len(line) == 0:  # Exit reading file when end of file reached
-            break
-        split_line = line.split(',')
-        user_dict[split_line[0]] = split_line[1]
-
+try:
+    with open('user_login_data.txt', 'r', encoding="UTF-8") as file:
+        while True:
+            # For each line, extract the username and hashed password
+            line = file.readline()
+            line = line.strip()
+            if len(line) == 0:  # Exit reading file when end of file reached
+                break
+            split_line = line.split(',')
+            user_dict[split_line[0]] = split_line[1]
+except:
+    file = open('user_login_data.txt', 'w', encoding="UTF-8")
+    file.close()
 
 
 # This function is called before each request to the page.
@@ -99,7 +102,7 @@ def process_login():
     """
     Process the login form from /login.html
     """
-    
+
     username = request.form['username']
     password = request.form['password']
 
@@ -130,16 +133,34 @@ def process_register():
     Process the login form from /login.html
     """
     username = request.form['username']
-    password = sha256_crypt.hash(request.form['password'])
+    password = request.form['password']
 
     if username in user_dict:
         flash("Username already exists.")
         return redirect(url_for("register"))
 
-    user_dict[username] = password
-    with open('user_login_data.txt', 'a', encoding="UTF-8") as file:
-        file.writelines(username + "," + password)
-    return redirect(url_for("home"))
+    valid_password = True
+    if len(password) < 12:
+        valid_password = False
+        flash("Password must be 12 characters in length.")
+    if not re.compile(r'\W+', re.ASCII).search(password):
+        valid_password = False
+        flash("Password contain at least one special character.")
+    if not re.compile(r'[a-z]+', re.ASCII).search(password):
+        valid_password = False
+        flash("Password must contain at least one lower case letter.")
+    if not re.compile(r'[A-Z]+', re.ASCII).search(password):
+        valid_password = False
+        flash("Password must contain at least one upper case letter.")
+
+    if valid_password:
+        user_dict[username] = sha256_crypt.hash(password)
+        with open('user_login_data.txt', 'a', encoding="UTF-8") as file:
+            file.writelines(username + "," + password)
+        flash("Account created successfully.")
+        return redirect(url_for("home"))
+
+    return redirect(url_for("register"))
 
 
 @app.route("/logout.html")
