@@ -1,11 +1,22 @@
 <!DOCTYPE html>
 <html>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
     <head>
         <meta charset="utf-8" />
         <title>SDEV 300, Assignment 6</title>
     </head>
     <body>
-        <!-- Just a little welcome message under a heading. Includes the current time/date, doesn't update. -->>
+        <!-- Just a little welcome message under a heading. Includes the current time/date, doesn't update. -->
         <h1>Welcome to Flask</h1>
         <p>It's currently {{ date.strftime("%A, %d %B, %Y at %I:%M:%S %p") }}</p>
         <p>This is an example of a webpage that is created using Flask in 
