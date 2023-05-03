@@ -140,3 +140,14 @@ def process_register():
     with open('user_login_data.txt', 'a', encoding="UTF-8") as file:
         file.writelines(username + "," + password)
     return redirect(url_for("home"))
+
+
+@app.route("/logout.html")
+def logout_script():
+    """
+    Log out the current user.
+    """
+    global cur_user
+    cur_user = None
+    flash("Logged out successfully.")
+    return redirect(url_for("login"))
