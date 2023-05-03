@@ -22,9 +22,10 @@ app.config.update(
 # file is probably inefficient, but oh well, best I can do for now.
 # Using a dictionary allows no duplicate users, allows for quick searching
 
-cur_user = None
+CUR_USER = None
 user_dict = {}
 
+# Creates a new file if one doesn't exist.
 try:
     with open('user_login_data.txt', 'r', encoding="UTF-8") as file:
         while True:
@@ -35,9 +36,9 @@ try:
                 break
             split_line = line.split(',')
             user_dict[split_line[0]] = split_line[1]
-except:
-    file = open('user_login_data.txt', 'w', encoding="UTF-8")
-    file.close()
+except FileNotFoundError:
+    create_file = open('user_login_data.txt', 'w', encoding="UTF-8")
+    create_file.close()
 
 
 # This function is called before each request to the page.
@@ -49,7 +50,8 @@ def check_for_login_session():
 
     # If the user is not logged in and is not trying ot access either the login or registration
     # page, redirect them to the login page
-    if cur_user is None:
+    if CUR_USER is None:
+        # The regex here matches any subpage of login or register
         login_regex = re.compile(r'/login.*\.html')
         register_regex = re.compile(r'/register.*\.html')
         if not (login_regex.search(request.path)
@@ -91,12 +93,13 @@ def login():
     """
     If the user is not logged in, prompt for the user to log in.
     """
-    if cur_user is not None:
+    if CUR_USER is not None:
         flash("You are already logged in.")
         return redirect(url_for("home"))
     return render_template("default_login_page.html")
 
 
+# Should probably be in the scripts folder...
 @app.route("/login/process_login.html", methods=['GET', 'POST'])
 def process_login():
     """
@@ -106,27 +109,31 @@ def process_login():
     username = request.form['username']
     password = request.form['password']
 
+    # If the user exists and the password matches, log in and redirect to home
     if username in user_dict:
         if sha256_crypt.verify(password, user_dict[username]):
-            global cur_user
-            cur_user = username
+            global CUR_USER
+            CUR_USER = username
             return redirect(url_for("home"))
 
+    # Otherwise, error and return to login
     flash("Username/password combo incorrect.")
     return redirect(url_for("login"))
 
 
+# Registration page
 @app.route("/register.html", methods=['GET', 'POST'])
 def register():
     """
     If the user is not logged in, prompt for the user to log in.
     """
-    if cur_user is not None:
+    if CUR_USER is not None:
         flash("You are already logged in.")
         return redirect(url_for("home"))
     return render_template("default_register_page.html")
 
 
+# Process registration (should probably be put in scrits folder...)
 @app.route("/register/process_register.html", methods=['GET', 'POST'])
 def process_register():
     """
@@ -135,10 +142,12 @@ def process_register():
     username = request.form['username']
     password = request.form['password']
 
+    # If username already exists, display error.
     if username in user_dict:
         flash("Username already exists.")
         return redirect(url_for("register"))
 
+    # Check for and display errors relating to any password requirements.
     valid_password = True
     if len(password) < 12:
         valid_password = False
@@ -153,6 +162,7 @@ def process_register():
         valid_password = False
         flash("Password must contain at least one upper case letter.")
 
+    # If the password is valid, add it to the file and dictionary
     if valid_password:
         user_dict[username] = sha256_crypt.hash(password)
         with open('user_login_data.txt', 'a', encoding="UTF-8") as file:
@@ -160,15 +170,17 @@ def process_register():
         flash("Account created successfully.")
         return redirect(url_for("home"))
 
+    # On an invalid password, return to the register page (with the errors)
     return redirect(url_for("register"))
 
 
+# Logout script (should probably be in the script folder...)
 @app.route("/logout.html")
 def logout_script():
     """
     Log out the current user.
     """
-    global cur_user
-    cur_user = None
+    global CUR_USER
+    CUR_USER = None
     flash("Logged out successfully.")
     return redirect(url_for("login"))
