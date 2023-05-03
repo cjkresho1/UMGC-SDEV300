@@ -166,7 +166,7 @@ def process_register():
     if valid_password:
         user_dict[username] = sha256_crypt.hash(password)
         with open('user_login_data.txt', 'a', encoding="UTF-8") as file:
-            file.writelines(username + "," + password)
+            file.writelines(username + "," + user_dict[username])
         flash("Account created successfully.")
         return redirect(url_for("home"))
 
