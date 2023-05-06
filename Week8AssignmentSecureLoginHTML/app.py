@@ -5,6 +5,7 @@ from datetime import datetime
 import re
 from flask import Flask
 from flask import flash
+from flask import session
 from flask import redirect
 from flask import render_template
 from flask import request
@@ -21,8 +22,6 @@ app.config.update(
 # Load in the existing user login information; storing information as a text
 # file is probably inefficient, but oh well, best I can do for now.
 # Using a dictionary allows no duplicate users, allows for quick searching
-
-CUR_USER = None
 user_dict = {}
 
 # Creates a new file if one doesn't exist.
@@ -50,14 +49,20 @@ def check_for_login_session():
 
     # If the user is not logged in and is not trying ot access either the login or registration
     # page, redirect them to the login page
-    if CUR_USER is None:
-        # The regex here matches any subpage of login or register
-        login_regex = re.compile(r'/login.*\.html')
-        register_regex = re.compile(r'/register.*\.html')
-        if not (login_regex.search(request.path)
-                or register_regex.search(request.path)):
-            flash("You must be logged in to access other pages on this site.", "error")
-            return redirect(url_for("login"))
+    try:
+        if session['cur_user'] is None:
+            # The regex here matches any subpage of login or register
+            login_regex = re.compile(r'/login.*\.html')
+            register_regex = re.compile(r'/register.*\.html')
+            if not (login_regex.search(request.path)
+                    or register_regex.search(request.path)):
+                flash(
+                    "You must be logged in to access other pages on this site.", "error")
+                return redirect(url_for("login"))
+    except KeyError:
+        session['cur_user'] = None
+        flash("You must be logged in to access other pages on this site.", "error")
+        return redirect(url_for("login"))
 
 
 # The default welcome page for the site.
@@ -93,7 +98,7 @@ def login():
     """
     If the user is not logged in, prompt for the user to log in.
     """
-    if CUR_USER is not None:
+    if session['cur_user'] is not None:
         flash("You are already logged in.")
         return redirect(url_for("home"))
     return render_template("default_login_page.html")
@@ -112,8 +117,7 @@ def process_login():
     # If the user exists and the password matches, log in and redirect to home
     if username in user_dict:
         if sha256_crypt.verify(password, user_dict[username]):
-            global CUR_USER
-            CUR_USER = username
+            session['cur_user'] = username
             return redirect(url_for("home"))
 
     # Otherwise, error and return to login
@@ -127,7 +131,7 @@ def register():
     """
     If the user is not logged in, prompt for the user to log in.
     """
-    if CUR_USER is not None:
+    if session['cur_user'] is not None:
         flash("You are already logged in.")
         return redirect(url_for("home"))
     return render_template("default_register_page.html")
@@ -180,7 +184,6 @@ def logout_script():
     """
     Log out the current user.
     """
-    global CUR_USER
-    CUR_USER = None
+    session['cur_user'] = None
     flash("Logged out successfully.")
     return redirect(url_for("login"))
