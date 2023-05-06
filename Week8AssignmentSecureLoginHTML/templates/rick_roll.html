@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+<head>
+        <meta charset="utf-8" />
+        <title>Rickroll.jpg</title>
+    </head>
+    <body>
+        <!-- Displays a funny little ricroll image. -->
+        <h1>YOU'VE BEEN PRANKED</h1>
+        <h3>Literally just a page with a Rickroll</h3>
+        <img src='/static/rick_roll.jpg'  alt="Rickroll Image">
+    </body>
+</html>

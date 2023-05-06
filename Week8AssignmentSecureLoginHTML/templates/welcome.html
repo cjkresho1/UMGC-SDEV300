@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+    <head>
+        <meta charset="utf-8" />
+        <title>SDEV 300, Assignment 6</title>
+    </head>
+    <body>
+        <!-- Just a little welcome message under a heading. Includes the current time/date, doesn't update. -->
+        <li><a href="logout.html" title="Logout"> Click here to log out.</a></li>
+        <h1>Welcome to Flask</h1>
+        <p>It's currently {{ date.strftime("%A, %d %B, %Y at %I:%M:%S %p") }}</p>
+        <p>This is an example of a webpage that is created using Flask in 
+          Python, with HTML templates defining the page structure. This 
+          is the homepage, you can use the links below to navigate through 
+          the other two pages that are created in this assignment.
+        </p>
+        <!-- A list of links to the other webpages this site has to offer. -->
+        <h2>Webpage Links:</h2>
+        <ul>
+          <li><a href="game_site_list.html" title="Coolest Games List">List of Coolest Games Ever</a></li>
+          <li><a href="rick_roll.html" title="Display a Cool Image">Display a Cool Image</a></li>
+
+        </ul>
+    </body>
+</html>

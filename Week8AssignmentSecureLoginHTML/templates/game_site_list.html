@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+<head>
+        <meta charset="utf-8" />
+        <title>Coolest Games List</title>
+    </head>
+    <body>
+        <!-- A little headder, followed by an ordered list of links to my favorite video games. -->
+        <h1>Coolest Games List</h1>
+        <p>Here's a list of the coolest games I've ever played, and links to 
+            their websites. Hopefully you recognize one of these!
+        </p>
+        <h2>Coolest Games Ever, In Order:</h2>
+        <ol>
+          <li><a href="https://newcp.net/en/" title="Club Penguin">Club Penguin, Fan Remake</a><div></div><img src="/static/club_penguin.png"></li>
+          <li><a href="https://www.webkinz.com/" title="Webkinz">Webkinz</a><div></div><img src="/static/webkinz_img.jpg"></li>
+          <li><a href="https://www.warframe.com/landing" title="warframe">Warframe</a><div></div><img src="/static/warfame_img.png"></li>
+        </ul>
+    </body>
+</html>

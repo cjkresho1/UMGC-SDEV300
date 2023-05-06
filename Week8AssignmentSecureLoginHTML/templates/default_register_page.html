@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+<head>
+    <title>Please Register</title>
+    <style>
+        div {
+            margin-bottom: 5px;
+        }
+
+        label {
+            display: block;
+            float: left;
+            width: 150px;
+            text-align: right;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        input.submit {
+            margin-left: 160px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Please Log In</h1>
+    <form action="/login/process_login.html" method="post">
+        <div>
+            <label for="username">Username</label>
+            <input type="text" name="username">
+        </div>
+        <div>
+            <label for="password">Password</label>
+            <input type="password" name="password">
+        </div>
+        <div>
+            <input type="submit" class="submit" value="Register", formaction="/register/process_register.html">
+        </div>
+    </form>
+
+
+    Passwords must be 12 characters in length and contain:
+    <table border="1">
+        <caption>Password Requirements</caption>
+         <tr>
+          <th>Requirement</th>
+          <th>Number</th>
+          <th>Example</th>
+         </tr>
+         <tr>
+          <td>Uppercase</td>
+          <td>At Least 1</td>
+          <td>ABC...</td>
+         </tr>
+         <tr>
+          <td>Lowercase</td>
+          <td>At Least 1</td>
+          <td>abc...</td>
+         </tr>
+         <tr>
+          <td>Special Character</td>
+          <td>At Least 1</td>
+          <td>!@#$%^&*...</td>
+         </tr>
+        </table>
+</body>
+
+</html>

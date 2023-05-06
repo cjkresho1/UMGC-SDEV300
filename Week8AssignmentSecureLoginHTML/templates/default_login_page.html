@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+<head>
+    <title>Please Log In</title>
+    <style>
+        div {
+            margin-bottom: 5px;
+        }
+
+        label {
+            display: block;
+            float: left;
+            width: 150px;
+            text-align: right;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        input.submit {
+            margin-left: 160px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Please Log In</h1>
+    <form action="/login/process_login.html" method="post">
+        <div>
+            <label for="username">Username</label>
+            <input type="text" name="username">
+        </div>
+        <div>
+            <label for="password">Password</label>
+            <input type="password" name="password">
+        </div>
+        <div>
+            <input type="submit" class="submit" value="Log In", formaction="/login/process_login.html">
+        </div>
+    </form>
+
+
+    <li><a href="register.html" title="Registration Page">No account? Create one here.</a></li>
+</body>
+
+</html>
