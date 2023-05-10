@@ -71,7 +71,7 @@ def home():
     """
     Renders a the welcome homepage. Datetime is passed for displaying the system time.
     """
-    return render_template("welcome.html", date=datetime.now())
+    return render_template("welcome.html", date=datetime.now(), user=session["cur_user"])
 
 
 # Displays an image in the browser. It's a prank hehe
@@ -141,7 +141,7 @@ def register():
 @app.route("/register/process_register.html", methods=['GET', 'POST'])
 def process_register():
     """
-    Process the login form from /login.html
+    Process the register form from /register.html
     """
     username = request.form['username']
     password = request.form['password']
@@ -170,7 +170,7 @@ def process_register():
     if valid_password:
         user_dict[username] = sha256_crypt.hash(password)
         with open('user_login_data.txt', 'a', encoding="UTF-8") as file:
-            file.writelines(username + "," + user_dict[username])
+            file.writelines(username + "," + user_dict[username] + "\n")
         flash("Account created successfully.")
         return redirect(url_for("login"))
 
@@ -187,3 +187,53 @@ def logout_script():
     session['cur_user'] = None
     flash("Logged out successfully.")
     return redirect(url_for("login"))
+
+
+# Display the password change page
+@app.route("/change_password.html", methods=['GET', 'POST'])
+def change_password():
+    """
+    Display the page for changing the user's password.
+    """
+    return render_template("default_password_change_page.html")
+
+
+# Script for changing password
+@app.route("/auth/change_password.html", methods=['GET', 'POST'])
+def change_password_script():
+    """
+    Attempts to change the user's password.
+    """
+    old_password = request.form['old_password']
+    new_password = request.form['new_password']
+
+
+    if not sha256_crypt.verify(old_password, user_dict[session['cur_user']]):
+            flash("Incorrect old password.")
+            return redirect(url_for("change_password"))
+
+    # Check for and display errors relating to any password requirements.
+    valid_password = True
+    if len(new_password) < 12:
+        valid_password = False
+        flash("Password must be 12 characters in length.")
+    if not re.compile(r'\W+', re.ASCII).search(new_password):
+        valid_password = False
+        flash("Password contain at least one special character.")
+    if not re.compile(r'[a-z]+', re.ASCII).search(new_password):
+        valid_password = False
+        flash("Password must contain at least one lower case letter.")
+    if not re.compile(r'[A-Z]+', re.ASCII).search(new_password):
+        valid_password = False
+        flash("Password must contain at least one upper case letter.")
+
+    # If the password is valid, add it to the file and dictionary
+    if valid_password:
+        user_dict[session["cur_user"]] = sha256_crypt.hash(new_password)
+        with open('user_login_data.txt', 'a', encoding="UTF-8") as file:
+            file.writelines(session["cur_user"] + "," + user_dict[session["cur_user"]] + "\n")
+        flash("Password changed successfully.")
+        return redirect(url_for("home"))
+
+    # On an invalid password, return to the register page (with the errors)
+    return redirect(url_for("change_password"))

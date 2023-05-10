@@ -17,6 +17,8 @@
     </head>
     <body>
         <!-- Just a little welcome message under a heading. Includes the current time/date, doesn't update. -->
+        Logged in as <strong>{{user}}</strong>
+        <li><a href="change_password.html" title="Change Password">Change Password</a></li>
         <li><a href="logout.html" title="Logout"> Click here to log out.</a></li>
         <h1>Welcome to Flask</h1>
         <p>It's currently {{ date.strftime("%A, %d %B, %Y at %I:%M:%S %p") }}</p>
