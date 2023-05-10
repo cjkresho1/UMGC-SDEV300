@@ -135,6 +135,19 @@ def process_login():
             return redirect(url_for("home"))
 
     # Otherwise, error and return to login
+    # Log the failed loggin attempt first
+    date=datetime.now()
+    dateString = date.strftime("%m/%d/%Y")
+    time = date.strftime("%H:%M:%S.%f")
+    IP = request.remote_addr
+    try:
+        with open('Log.txt', 'a', encoding="UTF-8") as file:
+            file.writelines(f"FailedLoginAttempt, Username={username!s}, Password={password!s}, Date={dateString!s}, Time={time!s}, IP={IP!s}\n")
+    except FileNotFoundError:
+        with open('Log.txt', 'w', encoding="UTF-8") as file:
+            file.writelines(f"FailedLoginAttempt, Username={username!s}, Password={password!s}, Date={dateString!s}, Time={time!s}, IP={IP!s}\n")
+
+
     flash("Username/password combo incorrect.")
     return redirect(url_for("login"))
 
