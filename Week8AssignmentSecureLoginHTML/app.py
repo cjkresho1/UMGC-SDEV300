@@ -47,7 +47,7 @@ try:
             # For each line, add the common password to the list
             line = file.readline()
             line = line.strip()
-            if len(line) == 0: # Exit at EOF
+            if len(line) == 0:  # Exit at EOF
                 break
             common_passwords.append(line)
 except FileNotFoundError:
@@ -136,17 +136,20 @@ def process_login():
 
     # Otherwise, error and return to login
     # Log the failed loggin attempt first
-    date=datetime.now()
-    dateString = date.strftime("%m/%d/%Y")
+    date = datetime.now()
+    date_string = date.strftime("%m/%d/%Y")
     time = date.strftime("%H:%M:%S.%f")
-    IP = request.remote_addr
+    user_ip = request.remote_addr
     try:
-        with open('Log.txt', 'a', encoding="UTF-8") as file:
-            file.writelines(f"FailedLoginAttempt, Username={username!s}, Password={password!s}, Date={dateString!s}, Time={time!s}, IP={IP!s}\n")
+        with open('Log.txt', 'a', encoding="UTF-8") as log_file:
+            log_file.writelines(f"FailedLoginAttempt, Username={username!s}, " +
+                               "Password={password!s}, Date={date_string!s}, " +
+                               "Time={time!s}, IP={user_ip!s}\n")
     except FileNotFoundError:
-        with open('Log.txt', 'w', encoding="UTF-8") as file:
-            file.writelines(f"FailedLoginAttempt, Username={username!s}, Password={password!s}, Date={dateString!s}, Time={time!s}, IP={IP!s}\n")
-
+        with open('Log.txt', 'w', encoding="UTF-8") as new_log_file:
+            new_log_file.writelines(f"FailedLoginAttempt, Username={username!s}, " +
+                               "Password={password!s}, Date={date_string!s}, " +
+                               "Time={time!s}, IP={user_ip!s}\n")
 
     flash("Username/password combo incorrect.")
     return redirect(url_for("login"))
@@ -199,8 +202,8 @@ def process_register():
     # If the password is valid, add it to the file and dictionary
     if valid_password:
         user_dict[username] = sha256_crypt.hash(password)
-        with open('user_login_data.txt', 'a', encoding="UTF-8") as file:
-            file.writelines(username + "," + user_dict[username] + "\n")
+        with open('user_login_data.txt', 'a', encoding="UTF-8") as user_file:
+            user_file.writelines(username + "," + user_dict[username] + "\n")
         flash("Account created successfully.")
         return redirect(url_for("login"))
 
@@ -237,10 +240,9 @@ def change_password_script():
     old_password = request.form['old_password']
     new_password = request.form['new_password']
 
-
     if not sha256_crypt.verify(old_password, user_dict[session['cur_user']]):
-            flash("Incorrect old password.")
-            return redirect(url_for("change_password"))
+        flash("Incorrect old password.")
+        return redirect(url_for("change_password"))
 
     # Check for and display errors relating to any password requirements.
     valid_password = True
@@ -263,8 +265,9 @@ def change_password_script():
     # If the password is valid, add it to the file and dictionary
     if valid_password:
         user_dict[session["cur_user"]] = sha256_crypt.hash(new_password)
-        with open('user_login_data.txt', 'a', encoding="UTF-8") as file:
-            file.writelines(session["cur_user"] + "," + user_dict[session["cur_user"]] + "\n")
+        with open('user_login_data.txt', 'a', encoding="UTF-8") as user_account_file:
+            user_account_file.writelines(session["cur_user"] + "," +
+                            user_dict[session["cur_user"]] + "\n")
         flash("Password changed successfully.")
         return redirect(url_for("home"))
 
