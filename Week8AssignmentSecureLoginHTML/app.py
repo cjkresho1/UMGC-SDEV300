@@ -23,6 +23,7 @@ app.config.update(
 # file is probably inefficient, but oh well, best I can do for now.
 # Using a dictionary allows no duplicate users, allows for quick searching
 user_dict = {}
+common_passwords = []
 
 # Creates a new file if one doesn't exist.
 try:
@@ -38,6 +39,19 @@ try:
 except FileNotFoundError:
     create_file = open('user_login_data.txt', 'w', encoding="UTF-8")
     create_file.close()
+
+# Add the common passwords to the list
+try:
+    with open('CommonPassword.txt', 'r', encoding="UTF-8") as file:
+        while True:
+            # For each line, add the common password to the list
+            line = file.readline()
+            line = line.strip()
+            if len(line) == 0: # Exit at EOF
+                break
+            common_passwords.append(line)
+except FileNotFoundError:
+    common_passwords.append("password")
 
 
 # This function is called before each request to the page.
@@ -165,6 +179,9 @@ def process_register():
     if not re.compile(r'[A-Z]+', re.ASCII).search(password):
         valid_password = False
         flash("Password must contain at least one upper case letter.")
+    if password in common_passwords:
+        valid_password = False
+        flash("The chosen password is a commononly used one, and is invalid.")
 
     # If the password is valid, add it to the file and dictionary
     if valid_password:
@@ -226,6 +243,9 @@ def change_password_script():
     if not re.compile(r'[A-Z]+', re.ASCII).search(new_password):
         valid_password = False
         flash("Password must contain at least one upper case letter.")
+    if new_password in common_passwords:
+        valid_password = False
+        flash("The chosen password is a commononly used one, and is invalid.")
 
     # If the password is valid, add it to the file and dictionary
     if valid_password:
